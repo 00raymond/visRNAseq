@@ -1,0 +1,12 @@
+<!doctype html>
+<title>Upload Files</title>
+<h1>Upload Files</h1>
+<form method=post enctype=multipart/form-data>
+  <label for="genome_file">Reference Genome (FASTA):</label>
+  <input type=file name=genome_file id=genome_file>
+  <br>
+  <label for="seq_file">Raw RNA Seq. Data (FASTQ/BAM):</label>
+  <input type=file name=seq_file id=seq_file>
+  <br>
+  <input type=submit value=Upload>
+</form>
