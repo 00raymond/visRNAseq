@@ -43,7 +43,7 @@ def quality_metrics(fastq_file, sampling_fraction=0.01):
     plt.xlabel('Read Length')
     plt.ylabel('Frequency')
 
-    path_to_save = os.path.join('/app', 'static')
+    path_to_save = os.path.join('/app/app', 'static')
 
     plt.tight_layout()
     plot_file_path = os.path.join(path_to_save, 'quality_metrics.png')
