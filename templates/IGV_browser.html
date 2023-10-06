@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IGV Analysis</title>
+
+    {#  IGV imports below  #}
+    <link rel="stylesheet" type="text/css" href="https://igv.org/web/release/2.8.6/dist/igv.min.css">
+    <script src="https://igv.org/web/release/2.8.6/dist/igv.min.js"></script>
+
+</head>
+<body>
+    <div id="igvDiv" style="padding-top: 10px;padding-bottom: 10px; border:1px solid lightgray"></div>
+</body>
+<script type="text/javascript">
+    window.onload = function() {
+        initializeIGV("path_to_your_genome.fasta", "path_to_your_sequence.bam");
+    };
+</script>
+<script type="text/javascript">
+    function initializeIGV(genomePath, sequencePath) {
+        let options = {
+            locus: "chr1:1-100",  // locus display
+            reference: {
+                id: "Reference Genome",
+                fastaURL: genomePath,
+                indexed: false
+            },
+            tracks: [
+                {
+                    name: "Your Sequence Data",
+                    url: sequencePath,
+                    format: "fastq",
+                    indexed: false
+                }
+            ]
+        };
+
+        let igvDiv = document.getElementById("igvDiv");
+        igv.createBrowser(igvDiv, options);
+    }
+</script>
+
+</html>
+
