@@ -1,12 +1,25 @@
 <!doctype html>
 <title>Upload Files</title>
 <h1>Upload Files</h1>
-<form method=post enctype=multipart/form-data>
+
+<!-- FASTQ Visualization -->
+<form method=post enctype=multipart/form-data action="{{ url_for('upload_file') }}">
+  <label for="seq_file">Raw RNA Seq. Data (FASTQ):</label>
+  <input type=file name=seq_file id=seq_file>
+  <br>
+  <input type=hidden name=action value="Visualize FASTQ">
+  <input type=submit value="Visualize FASTQ">
+</form>
+<br>
+
+<!-- IGV  -->
+<form method=post enctype=multipart/form-data action="{{ url_for('upload_file') }}">
   <label for="genome_file">Reference Genome (FASTA):</label>
   <input type=file name=genome_file id=genome_file>
   <br>
-  <label for="seq_file">Raw RNA Seq. Data (FASTQ/BAM):</label>
+  <label for="seq_file">Raw RNA Seq. Data (FASTQ):</label>
   <input type=file name=seq_file id=seq_file>
   <br>
-  <input type=submit value=Upload>
+  <input type=hidden name=action value="Upload for IGV Visualization">
+  <input type=submit value="Upload for IGV Visualization">
 </form>

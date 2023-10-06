@@ -21,33 +21,40 @@ def serve_plot(filename):
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        if 'genome_file' not in request.files or 'seq_file' not in request.files:
-            return render_template('file_failed.html', error='Missing file part')
+        action = request.form.get('action')
 
-        genome_file = request.files['genome_file']
-        seq_file = request.files['seq_file']
+        genome_file = request.files.get('genome_file', None)
+        seq_file = request.files.get('seq_file', None)
 
-        if genome_file.filename == '' or seq_file.filename == '':
-            return render_template('file_failed.html', error='No selected file')
+        if not seq_file or seq_file.filename == '':
+            return render_template('file_failed.html', error='FASTQ file is required')
 
-        if not (genome_file.filename.endswith('.fasta') or genome_file.filename.endswith('.fa')) or \
-                not (seq_file.filename.endswith('.fastq') or seq_file.filename.endswith('.bam')):
-            return render_template('file_failed.html', error='Invalid file format')
+        if not (seq_file.filename.endswith('.fastq') or seq_file.filename.endswith('.bam')):
+            return render_template('file_failed.html', error='Invalid FASTQ file format')
 
-        print("passed file exam")
-        genome_filename = secure_filename(genome_file.filename)
-        seq_filename = secure_filename(seq_file.filename)
-        genome_file.save(os.path.join(app.config['UPLOAD_FOLDER'], genome_filename))
-        seq_file.save(os.path.join(app.config['UPLOAD_FOLDER'], seq_filename))
+        if action == "Visualize FASTQ":
+            seq_filename = secure_filename(seq_file.filename)
+            seq_file.save(os.path.join(app.config['UPLOAD_FOLDER'], seq_filename))
+            seq_file_path = os.path.join(app.config['UPLOAD_FOLDER'], seq_filename)
+            plot_file_path = readqc.quality_metrics(seq_file_path)
+            return render_template('file_success.html', plot_file_path=plot_file_path)
 
-        print("files saved")
+        if action == "Upload for IGV Visualization":
+            if not genome_file or genome_file.filename == '':
+                return render_template('file_failed.html', error='FASTA file is required for IGV visualization')
 
-        seq_file_path = os.path.join(app.config['UPLOAD_FOLDER'], seq_filename)
-        plot_file_path = readqc.quality_metrics(seq_file_path)
+            if not (genome_file.filename.endswith('.fasta') or genome_file.filename.endswith('.fa')):
+                return render_template('file_failed.html', error='Invalid FASTA file format')
 
-        return render_template('file_success.html', plot_file_path=plot_file_path)
+            genome_filename = secure_filename(genome_file.filename)
+            genome_file.save(os.path.join(app.config['UPLOAD_FOLDER'], genome_filename))
+            seq_filename = secure_filename(seq_file.filename)
+            seq_file.save(os.path.join(app.config['UPLOAD_FOLDER'], seq_filename))
+
+            return render_template('igv_viewer.html', genome_filename=genome_filename, seq_filename=seq_filename)
 
     return render_template('upload_file.html')
+
 
 
 @app.route('/')
@@ -64,6 +71,16 @@ def hello_world():
 @app.route('/download')
 def download_page():
     return "download"
+
+
+@app.route('/igv_viewer/<genome_filename>/<seq_filename>')
+def igv_viewer(genome_filename, seq_filename):
+    genome_file_path = os.path.join(app.config['UPLOAD_FOLDER'], genome_filename)
+    seq_file_path = os.path.join(app.config['UPLOAD_FOLDER'], seq_filename)
+
+    # Set up IGV or do any other necessary processing here
+
+    return render_template('igv_viewer.html', genome_file_path=genome_file_path, seq_file_path=seq_file_path)
 
 
 if __name__ == '__main__':
